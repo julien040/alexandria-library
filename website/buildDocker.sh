@@ -1,10 +1,20 @@
 #!/usr/bin/env bash
 
+# Exit on error
+set -e
+
+# Build the website
 echo "Building the Astro website"
 sleep 1
 pnpm run build
 
-lastTag="1.0.0"
+# Get the last tag from the git repository
+lastTag=$(git describe --tags --abbrev=0)
 
+# Build the Docker image
 echo "Building the Docker image"
 docker build -t "ghcr.io/julien040/alexandria-library:$lastTag" --platform linux/amd64 .
+
+# Push the image to the GitHub Container Registry
+echo "Pushing the Docker image to the GitHub Container Registry"
+docker push "ghcr.io/julien040/alexandria-library:$lastTag"
