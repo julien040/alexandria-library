@@ -1,0 +1,46 @@
+---
+import "../styles/global.css";
+import Header from "../components/header.astro";
+import Footer from "../components/footer.astro";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>About - Alexandria</title>
+  </head>
+  <body>
+    <Header />
+    <main class="text-black/75 dark:text-white/60">
+      <h2 class="text-xl text-black dark:text-white mt-4">
+        What is the purpose of this website?
+      </h2>
+      <p>
+        Alexandria library is an attempt at organizing the vast collection of
+        articles of <a href="https://news.ycombinator.com/">Hacker News</a>. <br
+        />
+        This project is mostly for me to find interesting articles on my free time.
+        If it can help you too, then I'm glad.
+      </p>
+      <h2 class="text-xl text-black dark:text-white mt-4">How to use it?</h2>
+      <p>
+        All articles are organized like a file system. You can navigate through
+        the folders and subfolders to find the articles you want. <br />
+        You can also use the search bar to find folder by title or article by semantic
+        (embedding search).
+      </p>
+      <h2 class="text-xl text-black dark:text-white mt-4">
+        How did you make this project
+      </h2>
+      <p>
+        I invite you to consult <a class="hover:underline" href=""
+          >my blog post</a
+        >
+      </p>
+    </main>
+    <Footer />
+  </body>
+</html>

@@ -1,0 +1,43 @@
+---
+import Header from "../components/header.astro";
+import Table from "../components/table.astro";
+import Footer from "../components/footer.astro";
+import { getDataPath } from "../fetcher/getStaticPathHelper";
+
+export async function getStaticPaths() {
+  const dict = await getDataPath();
+  return Object.keys(dict).map((path) => {
+    return {
+      params: {
+        path,
+      },
+      props: {
+        ...dict[path],
+      },
+    };
+  });
+}
+
+import "../styles/global.css";
+
+const { title, subfolder, breadcrumbs, articles } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Alexandria - {title}</title>
+  </head>
+  <body class="max-w-2xl mx-auto px-6 py-8">
+    <Header />
+    <p class="text-black/75 dark:text-white/60 mb-4">
+      Here are some ressources related to {title}. Hoping you will find learning
+      material, alternative tools or just some interesting stuff.
+    </p>
+    <Table elements={subfolder} breadcrumbs={breadcrumbs} articles={articles} />
+    <Footer />
+  </body>
+</html>

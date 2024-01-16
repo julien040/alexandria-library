@@ -1,0 +1,19 @@
+---
+/* A path is 4 numbers between 0 and 7 (include)
+e.g. /5/2/1/7
+*/
+
+export const prerender = false;
+
+function randomIntFromInterval(min: number, max: number) {
+  // min and max included
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+const pathR = `/${randomIntFromInterval(0, 7)}/${randomIntFromInterval(
+  0,
+  7
+)}/${randomIntFromInterval(0, 7)}/${randomIntFromInterval(0, 7)}`;
+
+return Astro.redirect(pathR, 307);
+---

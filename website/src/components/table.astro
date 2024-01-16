@@ -1,0 +1,130 @@
+---
+interface element {
+  path: string;
+  title: string;
+}
+
+interface Props {
+  elements: element[];
+  breadcrumbs: element[];
+  articles: {
+    id: number;
+    title: string;
+    comments: number;
+    score: number;
+    url: string;
+    path: string;
+  }[];
+  showParent?: boolean;
+}
+
+function cutStringTooLong(str: string, max: number) {
+  if (str.length + 3 > max) {
+    return str.slice(0, max) + "...";
+  }
+  return str;
+}
+
+let { elements, breadcrumbs, articles, showParent } = Astro.props;
+
+if (!breadcrumbs) {
+  breadcrumbs = [];
+}
+---
+
+<div class="flex flex-col p-6 gap-2 rounded-xl bg-white/30 dark:bg-[#353535]">
+  <!-- Table Header -->
+  <div class="flex border-b dark:border-white/50 border-black/50 gap-3 pb-2">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+    >
+      <path
+        d="M4 20C3.45 20 2.97933 19.8043 2.588 19.413C2.19667 19.0217 2.00067 18.5507 2 18V6C2 5.45 2.196 4.97933 2.588 4.588C2.98 4.19667 3.45067 4.00067 4 4H10L12 6H20C20.55 6 21.021 6.196 21.413 6.588C21.805 6.98 22.0007 7.45067 22 8V18C22 18.55 21.8043 19.021 21.413 19.413C21.0217 19.805 20.5507 20.0007 20 20H4Z"
+        fill="#858484"></path>
+    </svg>
+    <!-- Breadcrumb -->
+    <span>
+      {
+        breadcrumbs.map((elem: element, i: number, tab: element[]) => {
+          return (
+            <a href={elem.path} data-astro-prefetch title={elem.title}>
+              <span
+                class={
+                  "text-sm hover:underline " +
+                  (i < tab.length - 1 ? "dark:text-white/50 text-black/50" : "")
+                }
+              >
+                {cutStringTooLong(elem.title, 35)}
+              </span>
+              <span class="text-sm mx-1">{i < tab.length - 1 ? ">" : ""}</span>
+            </a>
+          );
+        })
+      }
+      {breadcrumbs.length === 0 && "Name"}
+    </span>
+  </div>
+  <!-- Folder and articles -->
+  <div class="flex flex-col">
+    {elements.length > 0 && <h2 class="pl-2 text-md">Folders</h2>}
+    {
+      elements.map((elem: element, i: number) => {
+        return (
+          <a
+            href={elem.path}
+            data-astro-prefetch
+            class="p-2 hover:bg-white/70 dark:hover:bg-[#5d5d5d] rounded-md transition-all duration-300"
+          >
+            <span>{elem.title}</span>
+          </a>
+        );
+      })
+    }
+    {articles.length > 0 && <h2 class="pl-2 text-md mb-2 mt-4">Articles</h2>}
+    {
+      articles.map((article) => {
+        const domain = new URL(article.url).hostname;
+        const urlIcon = `https://www.google.com/s2/favicons?domain=${domain}&sz=256`;
+        const archiveURL = `https://web.archive.org/web/*/${article.url}`;
+
+        return (
+          <div class="flex flex-row items-center gap-2 py-2 px-4 hover:bg-white/70 dark:hover:bg-[#5d5d5d] rounded-md transition-all duration-300 ">
+            <img src={urlIcon} class="w-8 h-8 mr-2 rounded-full" />
+            <div class="flex flex-col">
+              <a href={article.url} class="hover:underline">
+                {article.title}
+              </a>
+              <div class="flex">
+                <a
+                  href={"https://news.ycombinator.com/item?id=" + article.id}
+                  class="text-sm dark:text-gray-400 hover:underline"
+                >
+                  See discussion ({article.comments} comments, {article.score}{" "}
+                  points) -
+                </a>
+                <a
+                  href={archiveURL}
+                  class="text-sm dark:text-gray-400 hover:underline ml-1"
+                >
+                  Archive
+                </a>
+                {showParent && (
+                  <a
+                    href={article.path}
+                    class="text-sm dark:text-gray-400 hover:underline ml-1"
+                  >
+                    - Parent
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })
+    }
+  </div>
+</div>

@@ -1,0 +1,48 @@
+---
+import Customheader from "../components/header.astro";
+import Table from "../components/table.astro";
+import Footer from "../components/footer.astro";
+import "../styles/global.css";
+import { getDataPath } from "../fetcher/getStaticPathHelper";
+
+const dict = await getDataPath();
+
+let tableElem: { title: string; path: string }[] = [];
+
+for (const key in dict) {
+  // Mean it's a root folder
+  if (key.length === 2) {
+    tableElem.push({
+      title: dict[key].title ?? "No title",
+      path: key,
+    });
+  }
+}
+
+let breadcrumbs = [
+  {
+    path: "/",
+    title: "Home",
+  },
+];
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Alexandria library</title>
+  </head>
+  <body class="">
+    <Customheader />
+    <h2 class="text-xl md:text-2xl">How to use it ?</h2>
+    <p class="text-black/75 dark:text-white/60 text-sm mb-4">
+      All articles are classified by topics using folders and subfolders. You
+      can navigate through by clicking on anyone of them.
+    </p>
+    <Table elements={tableElem} breadcrumbs={breadcrumbs} articles={[]} />
+    <Footer />
+  </body>
+</html>

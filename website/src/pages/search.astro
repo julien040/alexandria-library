@@ -1,0 +1,83 @@
+---
+export const prerender = false;
+
+import "../styles/global.css";
+import Customheader from "../components/header.astro";
+import Table from "../components/table.astro";
+import Footer from "../components/footer.astro";
+import search from "../fetcher/search";
+import type { Link, Article } from "../fetcher/getStaticPathHelper";
+
+const params = Astro.url.searchParams;
+
+let q = params.get("q");
+if (!q) {
+  q = "";
+}
+
+let folders: Link[] = [];
+let articles: Article[] = [];
+
+if (q != "") {
+  const res = await search(q);
+  folders = res.folders;
+  articles = res.articles;
+}
+
+const breadcrumbs = [
+  {
+    title: "Search",
+    path: "/search",
+  },
+  {
+    title: q,
+    path: "/search?q=" + encodeURIComponent(q),
+  },
+];
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{q === "" ? "Search - Alexandria" : q + " - Alexandria"}</title>
+  </head>
+  <body class="">
+    <Customheader />
+    <h2 class="text-xl mb-2">Search</h2>
+    <form
+      action="/search"
+      method="get"
+      class="flex items-center gap-2 h-full mb-4"
+    >
+      <input
+        required
+        type="text"
+        name="q"
+        value={q}
+        class="bg-white/30 focus:bg-white/40 dark:bg-[#353535] dark:focus:bg-white/20 rounded-lg text-sm p-3 w-full"
+      />
+      <button
+        type="submit"
+        class="bg-white/30 hover:bg-white/40 dark:bg-[#353535] dark:hover:bg-white/20 rounded-lg px-4 py-3 font-medium"
+      >
+        Search
+      </button>
+    </form>
+    <div>
+      {
+        q.length > 0 && (
+          <Table
+            articles={articles}
+            elements={folders}
+            breadcrumbs={breadcrumbs}
+            showParent
+          />
+        )
+      }
+    </div>
+    <Footer />
+  </body>
+</html>
