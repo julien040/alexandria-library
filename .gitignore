@@ -87,3 +87,6 @@ export/
 *.csv
 *.tar.gz
 .vercel
+
+# MacOS
+.DS_Store
