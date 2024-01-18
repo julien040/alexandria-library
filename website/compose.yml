@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  db:
+  pg-alexandria:
     image: ankane/pgvector
     container_name: pg-alexandria
     networks:
@@ -13,13 +13,11 @@ services:
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
 
-  app:
-    image: ghcr.io/julien040/alexandria-library
+  web-server-alexandria:
+    image: ghcr.io/julien040/alexandria-library:latest
     container_name: web-server-alexandria
-    ports:
-      - 127.0.0.1:8080:3000
     depends_on:
-      - db
+      - pg-alexandria
     networks:
       - captain-overlay-network
     environment:
@@ -27,7 +25,7 @@ services:
       - AZURE_AI_ENDPOINT
       - AZURE_AI_VERSION
       - AZURE_DEPLOYMENT_ID
-      - POSTGRES_CONNECTION_STRING=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/hn
+      - POSTGRES_CONNECTION_STRING=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pg-alexandria:5432/hn
 
 networks:
   captain-overlay-network:
