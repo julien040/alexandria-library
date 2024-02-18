@@ -66,6 +66,40 @@ const breadcrumbs = [
         Search
       </button>
     </form>
+    {
+      q.length === 0 && (
+        <div class="text-sm dark:text-white/60 text-black/60">
+          Here are some tips to help you find what you are looking for:
+          <ul class="list-decimal list-inside ml-4">
+            <li>
+              Make sure you type multiple words to express your intent because
+              the search sorts by meaning and not by string matching. For example for
+              Docker, you would type "docker container management" instead of
+              just "docker"
+            </li>
+            <li>
+              However, folders are matched by string matching, so you can type
+              the exact folder name to find it.
+            </li>
+            <li>
+              You can use keywords to restrict the search:
+              <ul class="list-disc ml-4 list-inside">
+                <li>score:300 to find articles with a score greater than 300</li>
+                <li>comments:10 to find articles with more than 10 comments</li>
+                <li>
+                  before:1643760000 to find articles before 2022-02-02 (unix
+                  timestamp)
+                </li>
+                <li>
+                  after:1643760000 to find articles after 2022-02-02 (unix
+                  timestamp)
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      )
+    }
     <div>
       {
         q.length > 0 && (
