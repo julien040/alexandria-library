@@ -88,8 +88,16 @@ function parseQuery(query: string) {
   for (const elem of queryList) {
     if (elem.startsWith("score:")) {
       score = Number(elem.slice(6));
+    } else if (elem.startsWith("points:")) {
+      score = Number(elem.slice(7));
+    } else if (elem.startsWith("point:")) {
+      score = Number(elem.slice(6));
     } else if (elem.startsWith("comment:")) {
       comment = elem.slice(8);
+    } else if (elem.startsWith("comments:")) {
+      comment = elem.slice(9);
+    } else if (elem.startsWith("descendants:")) {
+      comment = elem.slice(12);
     } else if (elem.startsWith("before:")) {
       before = Number(elem.slice(7));
     } else if (elem.startsWith("after:")) {
@@ -98,6 +106,8 @@ function parseQuery(query: string) {
       finalQuery += elem + " ";
     }
   }
+  // Shrinking the finalQuery to 300 characters
+  finalQuery = finalQuery.slice(0, 300);
   return { finalQuery, score, comment, before, after };
 }
 
