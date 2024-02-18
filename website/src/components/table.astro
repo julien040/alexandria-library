@@ -98,24 +98,24 @@ if (!breadcrumbs) {
               <a href={article.url} class="hover:underline">
                 {article.title}
               </a>
-              <div class="flex">
+              <div class="flex text-sm dark:text-gray-400 text-black/60">
                 <a
                   href={"https://news.ycombinator.com/item?id=" + article.id}
-                  class="text-sm dark:text-gray-400 hover:underline"
+                  class="text-sm hover:underline"
                 >
                   See discussion ({article.comments} comments, {article.score}{" "}
                   points) -
                 </a>
                 <a
                   href={archiveURL}
-                  class="text-sm dark:text-gray-400 hover:underline ml-1"
+                  class="text-sm hover:underline ml-1"
                 >
                   Archive
                 </a>
                 {showParent && (
                   <a
                     href={article.path}
-                    class="text-sm dark:text-gray-400 hover:underline ml-1"
+                    class="text-sm hover:underline ml-1"
                   >
                     - Parent
                   </a>
