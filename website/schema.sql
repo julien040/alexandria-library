@@ -161,7 +161,13 @@ ADD
 --
 -- Name: hn_embeddings_embedding_idx; Type: INDEX; Schema: public; Owner: julien
 --
-CREATE INDEX hn_embeddings_embedding_idx ON public.hn_embeddings USING ivfflat (embedding public.vector_ip_ops) WITH (lists = '100');
+SET
+    ivfflat.probes = 10;
+
+SET
+    maintenance_work_mem = "128MB";
+
+CREATE INDEX hn_embeddings_embedding_idx ON public.hn_embeddings USING ivfflat (embedding public.vector_cosine_ops) WITH (lists = '130');
 
 --
 -- Name: hn_post_descendants_idx; Type: INDEX; Schema: public; Owner: julien
