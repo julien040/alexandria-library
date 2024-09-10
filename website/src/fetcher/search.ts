@@ -38,8 +38,61 @@ async function searchFolders(query: string): Promise<Link[]> {
     }));
 }
 
+/* 
+urlToFetch = "https://api.diffbot.com/v3/article" + "?token=" + \
+        quote(getenv("DIFFBOT_API_KEY")) + "&url=" + \
+        quote(url).replace("?", "%3F")
+*/
+
+async function extractArticleContent(url: string): Promise<string> {
+    const urlToFetch =
+        "https://api.diffbot.com/v3/article" +
+        "?token=" +
+        encodeURIComponent(process.env.DIFFBOT_API_KEY ?? "") +
+        "&url=" +
+        encodeURIComponent(url).replace("?", "%3F");
+    const response = await fetch(urlToFetch);
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(
+            `Unable to fetch the article content (code ${
+                response.status
+            }). Additional information: ${JSON.stringify(data)}`
+        );
+    }
+    if (data.error) {
+        throw new Error(data.error);
+    }
+
+    const element = data.objects[0];
+    if (!element) {
+        throw new Error("The API did not return any article content");
+    }
+    if (!element.text || typeof element.text !== "string") {
+        throw new Error("No article content found from the API");
+    }
+    if (element.text.length === 0) {
+        throw new Error("The extracted article content is empty");
+    }
+    return element.text;
+}
+
 async function searchArticles(query: string): Promise<Article[]> {
     let { finalQuery, score, comment, before, after } = parseQuery(query);
+
+    // Let's check if the final query is an URL
+    let queryIsURL = false;
+    try {
+        const parsed = new URL(finalQuery);
+        queryIsURL =
+            (parsed.protocol === "http:" || parsed.protocol === "https:") &&
+            parsed.hostname !== "";
+    } catch (e) {}
+
+    // If the query is an URL, we extract the content
+    if (queryIsURL) {
+        finalQuery = await extractArticleContent(finalQuery);
+    }
 
     // Short circuit if the query is empty
     if (finalQuery.trim() === "") {
@@ -47,7 +100,7 @@ async function searchArticles(query: string): Promise<Article[]> {
     }
 
     // Add a maximum length to the query
-    finalQuery = finalQuery.slice(0, 300);
+    finalQuery = finalQuery.slice(0, 20000);
 
     // Get the embeddings of the query
     const embeddings = await getEmbeddings(finalQuery);
@@ -107,7 +160,6 @@ function parseQuery(query: string) {
         }
     }
     // Shrinking the finalQuery to 300 characters
-    finalQuery = finalQuery.slice(0, 300);
     return { finalQuery, score, comment, before, after };
 }
 
@@ -127,12 +179,8 @@ async function search(
 ): Promise<{ folders: Link[]; articles: Article[] }> {
     let articles: Article[] = [];
     let folders: Link[] = [];
-    try {
-        articles = await searchArticles(query);
-        folders = await searchFolders(query);
-    } catch (error) {
-        console.error(error);
-    }
+    articles = await searchArticles(query);
+    folders = await searchFolders(query);
 
     return {
         folders: folders,

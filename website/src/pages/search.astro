@@ -12,106 +12,126 @@ const params = Astro.url.searchParams;
 
 let q = params.get("q");
 if (!q) {
-  q = "";
+    q = "";
 }
 
 let folders: Link[] = [];
 let articles: Article[] = [];
 
+let error;
+
 if (q != "") {
-  const res = await search(q);
-  folders = res.folders;
-  articles = res.articles;
+    try {
+        const res = await search(q);
+        folders = res.folders;
+        articles = res.articles;
+    } catch (e) {
+        console.error(e);
+        error = e;
+    }
 }
 
 const breadcrumbs = [
-  {
-    title: "Search",
-    path: "/search",
-  },
-  {
-    title: q,
-    path: "/search?q=" + encodeURIComponent(q),
-  },
+    {
+        title: "Search",
+        path: "/search",
+    },
+    {
+        title: q,
+        path: "/search?q=" + encodeURIComponent(q),
+    },
 ];
 ---
 
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="/favicon.png" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
-    <title>{q === "" ? "Search - Alexandria" : q + " - Alexandria"}</title>
-  </head>
-  <body class="">
-    <Customheader />
-    <h2 class="text-xl mb-2">Search</h2>
-    <form
-      action="/search"
-      method="get"
-      class="flex items-center gap-2 h-full mb-4"
-    >
-      <input
-        required
-        type="text"
-        name="q"
-        value={q}
-        class="bg-white/30 focus:bg-white/40 dark:bg-[#353535] dark:focus:bg-white/20 rounded-lg text-sm p-3 w-full"
-      />
-      <button
-        type="submit"
-        class="bg-white/30 hover:bg-white/40 dark:bg-[#353535] dark:hover:bg-white/20 rounded-lg px-4 py-3 font-medium"
-      >
-        Search
-      </button>
-    </form>
-    {
-      q.length === 0 && (
-        <div class="text-sm dark:text-white/60 text-black/60">
-          Here are some tips to help you find what you are looking for:
-          <ul class="list-decimal list-inside ml-4">
-            <li>
-              Make sure you type multiple words to express your intent because
-              the search sorts by meaning and not by string matching. For example for
-              Docker, you would type "docker container management" instead of
-              just "docker"
-            </li>
-            <li>
-              However, folders are matched by string matching, so you can type
-              the exact folder name to find it.
-            </li>
-            <li>
-              You can use keywords to restrict the search:
-              <ul class="list-disc ml-4 list-inside">
-                <li>score:300 to find articles with a score greater than 300</li>
-                <li>comments:10 to find articles with more than 10 comments</li>
-                <li>
-                  before:1643760000 to find articles before 2022-02-02 (unix
-                  timestamp)
-                </li>
-                <li>
-                  after:1643760000 to find articles after 2022-02-02 (unix
-                  timestamp)
-                </li>
-              </ul>
-            </li>
-          </ul>
+    <head>
+        <meta charset="utf-8" />
+        <link rel="icon" href="/favicon.png" />
+        <meta name="viewport" content="width=device-width" />
+        <meta name="generator" content={Astro.generator} />
+        <title>{q === "" ? "Search - Alexandria" : q + " - Alexandria"}</title>
+    </head>
+    <body class="">
+        <Customheader />
+        <h2 class="text-xl mb-2">Search</h2>
+        <form
+            action="/search"
+            method="get"
+            class="flex items-center gap-2 h-full mb-4"
+        >
+            <input
+                required
+                type="text"
+                name="q"
+                value={q}
+                class="bg-white/30 focus:bg-white/40 dark:bg-[#353535] dark:focus:bg-white/20 rounded-lg text-sm p-3 w-full"
+            />
+            <button
+                type="submit"
+                class="bg-white/30 hover:bg-white/40 dark:bg-[#353535] dark:hover:bg-white/20 rounded-lg px-4 py-3 font-medium"
+            >
+                Search
+            </button>
+        </form>
+        {
+            q.length === 0 && (
+                <div class="text-sm dark:text-white/60 text-black/60">
+                    Here are some tips to help you find what you are looking
+                    for:
+                    <ul class="list-decimal list-inside ml-4">
+                        <li>
+                            Make sure you type multiple words to express your
+                            intent because the search sorts by meaning and not
+                            by string matching. For example for Docker, you
+                            would type "docker container management" instead of
+                            just "docker"
+                        </li>
+                        <li>
+                            However, folders are matched by string matching, so
+                            you can type the exact folder name to find it.
+                        </li>
+                        <li>
+                            You can also find related articles of a blog post by
+                            pasting the blog post url in the search box.
+                        </li>
+                        <li>
+                            Keywords can help you restricting the search:
+                            <ul class="list-disc ml-4 list-inside">
+                                <li>
+                                    score:300 to find articles with a score
+                                    greater than 300
+                                </li>
+                                <li>
+                                    comments:10 to find articles with more than
+                                    10 comments
+                                </li>
+                                <li>
+                                    before:1643760000 to find articles before
+                                    2022-02-02 (unix timestamp)
+                                </li>
+                                <li>
+                                    after:1643760000 to find articles after
+                                    2022-02-02 (unix timestamp)
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            )
+        }
+        <div>
+            {error && <div>{error}</div>}
+            {
+                q.length > 0 && (
+                    <Table
+                        articles={articles}
+                        elements={folders}
+                        breadcrumbs={breadcrumbs}
+                        showParent
+                    />
+                )
+            }
         </div>
-      )
-    }
-    <div>
-      {
-        q.length > 0 && (
-          <Table
-            articles={articles}
-            elements={folders}
-            breadcrumbs={breadcrumbs}
-            showParent
-          />
-        )
-      }
-    </div>
-    <Footer />
-  </body>
+        <Footer />
+    </body>
 </html>
