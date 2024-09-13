@@ -50,7 +50,8 @@ async function extractArticleContent(url: string): Promise<string> {
         "?token=" +
         encodeURIComponent(process.env.DIFFBOT_API_KEY ?? "") +
         "&url=" +
-        encodeURIComponent(url).replace("?", "%3F");
+        url;
+    console.log(urlToFetch);
     const response = await fetch(urlToFetch);
     const data = await response.json();
     if (!response.ok) {
